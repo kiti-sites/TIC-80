@@ -19,7 +19,7 @@ if(NINTENDO_SWITCH)
         target_link_libraries(tic80 PkgConfig::CURL)
     
         nx_generate_nacp(tic80.nacp
-            NAME    "TIC-80 tiny computer"
+            NAME    "Leaftron tiny computer"
             AUTHOR  "Nesbox, carstene1ns"
             VERSION ${PROJECT_VERSION})
     

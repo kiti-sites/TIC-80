@@ -1685,6 +1685,15 @@ static bool cli_requested(s32 argc, char** argv)
     return false;
 }
 
+static bool log_requested(s32 argc, char** argv)
+{
+    for(s32 i = 1; i < argc; i++)
+        if(!strcmp(argv[i], "--log"))
+            return true;
+
+    return false;
+}
+
 // The console-only run: the studio's commands over the ticks, no window. False
 // when the studio says the flag was another option's value after all.
 static bool run_cli(void)
@@ -1764,6 +1773,12 @@ int main(int argc, char* argv[])
 
     platform.appFolder = getAppFolder();
     make_folder(platform.appFolder);
+
+    if(log_requested(argc, argv))
+    {
+        fprintf(stderr, "[INFO] Starting Leaftron %s\n", LEAFTRON_VERSION);
+        fprintf(stderr, "[INFO] App folder: %s\n", platform.appFolder);
+    }
 
     // The flags are read before run_cli: the studio's argparse rewrites argv
     // in place, and a second scan after it declines would walk the compacted

@@ -1,0 +1,17 @@
+#pragma once
+
+#define TIC_RUNTIME_VERSION_LUA "Lua 5.3.6"
+#define TIC_RUNTIME_VERSION_RUBY "mruby 4.0.0 (Ruby 4.0)"
+#define TIC_RUNTIME_VERSION_JS "QuickJS-ng 0.17.0"
+#define TIC_RUNTIME_VERSION_MOON "MoonScript 0.5.0 (Lua 5.3.6)"
+#define TIC_RUNTIME_VERSION_YUE "YueScript 0.34.3"
+#define TIC_RUNTIME_VERSION_FENNEL "Fennel 1.5.0 (Lua 5.3.6)"
+#define TIC_RUNTIME_VERSION_SCHEME "s7 10.5"
+#define TIC_RUNTIME_VERSION_SQUIRREL "Squirrel 3.2 stable"
+#define TIC_RUNTIME_VERSION_WREN "Wren 0.4.0"
+#define TIC_RUNTIME_VERSION_WASM "wasm3 0.5.0"
+#define TIC_RUNTIME_VERSION_JANET "unknown"
+#define TIC_RUNTIME_VERSION_PYTHON "pocketpy 2.1.7"
+#define TIC_RUNTIME_VERSION_MINISCRIPT "MiniScript 2.0.0"
+#define TIC_RUNTIME_VERSION_FORTH "Lugforth 2026.10.28.3"
+#define TIC_RUNTIME_VERSION_GRAVITY "Gravity 0.9.9"

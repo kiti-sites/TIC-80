@@ -59,16 +59,28 @@ Module.tic80Viewport = function()
 
 (function()
 {
-	Module.tic80Viewport();
-	addEventListener('resize', Module.tic80Viewport);
-	addEventListener('orientationchange', Module.tic80Viewport);
+	if (typeof Module.onRuntimeInitialized === 'function')
+	{
+		const prev = Module.onRuntimeInitialized;
+		Module.onRuntimeInitialized = function() { prev(); Module.tic80Viewport(); };
+	}
+	else
+	{
+		Module.onRuntimeInitialized = function() { Module.tic80Viewport(); };
+	}
+	var _tic80ViewportSafe = function() {
+		if (!Module.calledRun) return;
+		Module.tic80Viewport();
+	};
+	addEventListener('resize', _tic80ViewportSafe);
+	addEventListener('orientationchange', _tic80ViewportSafe);
 
 	// The iOS URL bar and the soft keyboard move the visual viewport without a
 	// window resize.
 	if(window.visualViewport)
 	{
-		visualViewport.addEventListener('resize', Module.tic80Viewport);
-		visualViewport.addEventListener('scroll', Module.tic80Viewport);
+		visualViewport.addEventListener('resize', _tic80ViewportSafe);
+		visualViewport.addEventListener('scroll', _tic80ViewportSafe);
 	}
 
 	// A home-screen app on iOS can miss the resize on rotation; nudge the player when the canvas box moves.

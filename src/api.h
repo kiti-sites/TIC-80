@@ -810,7 +810,7 @@ enum
     macro(sync,                                                                                                         \
         "sync(mask=0 bank=0 tocart=false)",                                                                             \
                                                                                                                         \
-        "The pro version of TIC-80 contains 8 memory banks.\n"                                                          \
+        "The pro version of Leaftron contains 8 memory banks.\n"                                                          \
         "To switch between these banks, sync can be used to either load contents from a memory bank to runtime, "       \
         "or save contents from the active runtime to a bank.\n"                                                         \
         "The function can only be called once per frame."                                                               \

@@ -1044,7 +1044,7 @@ static MenuBarCategory MenubarCategories[] =
 #if defined(TIC80_PRO)
         {"BANK", MenubarBanks, COUNT_OF(MenubarBanks), false, tic_icon_bank, -1, tic_color_red, false},
 #endif
-        {"TIC-80", MenubarTic, COUNT_OF(MenubarTic), true, 0, -1, 0, false},
+        {"Leaftron", MenubarTic, COUNT_OF(MenubarTic), true, 0, -1, 0, false},
 };
 
 MenuBarCategory* studiomenu_more(void)

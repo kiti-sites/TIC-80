@@ -18,7 +18,7 @@ if(NINTENDO_3DS)
     target_link_libraries(${TIC80_TARGET} tic80studio png citro3d)
 
     ctr_generate_smdh(tic80.smdh
-        NAME        "TIC-80 tiny computer"
+        NAME        "Leaftron tiny computer"
         DESCRIPTION "Fantasy computer for making, playing and sharing tiny games"
         AUTHOR      "Nesbox, asie"
         ICON        ${CMAKE_SOURCE_DIR}/build/n3ds/icon.png)

@@ -1544,9 +1544,9 @@ void StaticInitMiniScript()
     MiniScript::value_init_constants();
     ErrorTypes::Init();
 
-    MiniScript::hostName = "TIC-80";
+    MiniScript::hostName = "Leaftron";
     MiniScript::hostVersion = TIC_VERSION;
-    MiniScript::hostInfo = "https://tic80.com/";
+    MiniScript::hostInfo = "https://leafole.dev/";
 
     auto f = Intrinsic::Create("tic80");
     // The one intrinsic whose lambda never reads the context, so the Context

@@ -32,17 +32,20 @@
 #endif
 
 #define TIC_VERSION   DEF2STR(TIC_VERSION_MAJOR) "." DEF2STR(TIC_VERSION_MINOR) "." DEF2STR(TIC_VERSION_REVISION) TIC_VERSION_STATUS TIC_VERSION_BUILD TIC_VERSION_POST " (" TIC_VERSION_HASH ")"
-#define TIC_PACKAGE   "com.nesbox.tic"
-#define TIC_NAME      "TIC-80"
+#define TIC_PACKAGE   "com.leafole.Leaftron"
+#define TIC_NAME      "Leaftron"
 #define TIC_NAME_FULL TIC_NAME " tiny computer"
+
+#define LEAFTRON_VERSION   "0.1.0-dev"
+#define LEAFTRON_CODENAME  "Initial Release"
 #define TIC_TITLE     TIC_NAME_FULL " " TIC_VERSION
 // A dev snapshot talks to the dev site — it runs the same code from the
 // same branch, its data is disposable, and testing there cannot touch the
 // real catalogue. A release talks to production.
 #if TIC_VERSION_IS_RELEASE
-#define TIC_HOST "tic80.com"
+#define TIC_HOST "leafole.dev"
 #else
-#define TIC_HOST "dev.tic80.com"
+#define TIC_HOST "leafole.dev"
 #endif
 #if defined(__TIC_WIN7__)
 #define TIC_WEBSITE_PROTOCOL "http://"

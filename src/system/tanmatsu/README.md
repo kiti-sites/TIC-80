@@ -157,7 +157,7 @@ purple diamond, the icon top right turns from a bug into a USB symbol.
 
 ```sh
 cd badgelink/tools
-./badgelink.sh appfs upload com.annejan.tic80 "TIC-80" 1 path/to/tic80.bin
+./badgelink.sh appfs upload com.leafole.Leaftron "Leaftron" 1 path/to/tic80.bin
 ./badgelink.sh fs mkdir /int/apps/com.annejan.tic80
 ./badgelink.sh fs upload /int/apps/com.annejan.tic80/metadata.json ../../../appfs/metadata.json
 ./badgelink.sh fs upload /int/apps/com.annejan.tic80/icon32.png    ../../../appfs/icon32.png

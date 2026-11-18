@@ -273,7 +273,7 @@ void tic80_tanmatsu_main(void)
 
     const tic80* product = &studio_mem(platform.studio)->product;
 
-    ESP_LOGI(TAG, "TIC-80 running, Fn+Esc to leave");
+    ESP_LOGI(TAG, "Leaftron running, Fn+Esc to leave");
 
     TickType_t next_frame = xTaskGetTickCount();
 

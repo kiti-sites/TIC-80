@@ -48,6 +48,8 @@ build/windows/zlib/x64/
 build/windows/lua/Release/
 build/windows/lua/Debug/
 build/windows/lua/x64/
+build/lea-build/
+build/lea-build-windows/
 lib/windows/res.aps
 lib/windows/tic.aps
 .DS_Store
@@ -199,3 +201,6 @@ build/*.map
 # local tooling, not part of the project
 .claude/
 openspec/
+
+# ignore all bin folders
+**/bin/

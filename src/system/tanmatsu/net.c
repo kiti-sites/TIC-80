@@ -271,7 +271,7 @@ static void perform_once(HttpGet* get)
         // seen to want more than fifteen seconds.
         .timeout_ms = 40000,
         .use_global_ca_store = true,
-        .user_agent = "TIC-80",
+        .user_agent = "Leaftron",
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&config);

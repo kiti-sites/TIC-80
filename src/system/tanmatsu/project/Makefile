@@ -72,7 +72,7 @@ badgelink:
 .PHONY: install
 install: build
 install:
-	cd badgelink/tools; ./badgelink.sh appfs upload $(SLUG) "TIC-80" 0 ../../$(BUILD)/tic80.bin
+	cd badgelink/tools; ./badgelink.sh appfs upload $(SLUG) "Leaftron" 0 ../../$(BUILD)/tic80.bin
 
 .PHONY: run
 run:

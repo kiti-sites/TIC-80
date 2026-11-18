@@ -1,7 +1,10 @@
 [![Build Status](https://github.com/nesbox/TIC-80/workflows/Build/badge.svg)](https://github.com/nesbox/TIC-80/actions?query=workflow%3ABuild)
 
-![TIC-80](https://tic80.com/img/logo64.png)
-**TIC-80 TINY COMPUTER** — [tic80.com](https://tic80.com)
+![Leaftron](https://tic80.com/img/logo64.png)
+**Leaftron TINY COMPUTER** — Leafole Labs fork of TIC-80
+
+Leaftron is an independent distribution of TIC-80, maintained by Leafole Labs.
+Original project by Nesbox (TIC-80), licensed under MIT.
 
 - [About](#about)
   - [Features](#features)

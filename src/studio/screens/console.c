@@ -114,7 +114,7 @@
 // clang-format on
 
 static const char* WelcomeText =
-    "TIC-80 is a fantasy computer for making, playing and sharing tiny games.\n\n"
+    "Leaftron is a fantasy computer for making, playing and sharing tiny games (a TIC-80's fork).\n\n"
     "It has built-in tools for development: code, sprites, maps, sound editors and the command line, "
     "which is enough to create a mini retro game.\n"
     "In the end, you will get a cartridge file, which can be stored and played on the website.\n\n"
@@ -851,6 +851,129 @@ static void onExitCommand(Console* console)
     askStart(console, CONSOLE_ASK_EXIT, onMoved);
 }
 
+static u64 leaftron_start_counter = 0;
+static bool leaftron_start_set = false;
+
+static u64 leaftron_uptime_seconds(void)
+{
+    if(!leaftron_start_set)
+    {
+        leaftron_start_counter = tic_sys_counter_get();
+        leaftron_start_set = true;
+    }
+    u64 now = tic_sys_counter_get();
+    u64 freq = tic_sys_freq_get();
+    if(freq == 0) freq = 1;
+    return (now - leaftron_start_counter) / freq;
+}
+
+static void onNeoFetchCommand(Console* console)
+{
+    char buf[256];
+    printLine(console);
+    printFront(console, "       /\\_/\\\n");
+    printFront(console, "      ( o.o )\n");
+    printFront(console, "       > ^ <\n\n");
+    printFront(console, "    LEAFTRON\n");
+    printFront(console, "    ----------------\n");
+    snprintf(buf, sizeof buf, "    Version: %s\n", LEAFTRON_VERSION);
+    printFront(console, buf);
+    snprintf(buf, sizeof buf, "    Codename: %s\n", LEAFTRON_CODENAME);
+    printFront(console, buf);
+    printFront(console, "    Base: TIC-80\n");
+    printFront(console, "    Resolution: 240x136\n");
+    printFront(console, "    Runtime: Lua\n");
+    printFront(console, "    Developer: Leafole Labs\n");
+    commandDone(console);
+}
+
+static void onSysInfoCommand(Console* console)
+{
+    char buf[256];
+    printLine(console);
+    printFront(console, "Leaftron System Information\n");
+    printFront(console, "---------------------------\n");
+    snprintf(buf, sizeof buf, "System: %s\n", TIC_NAME);
+    printFront(console, buf);
+    snprintf(buf, sizeof buf, "Version: %s\n", LEAFTRON_VERSION);
+    printFront(console, buf);
+    snprintf(buf, sizeof buf, "Codename: %s\n", LEAFTRON_CODENAME);
+    printFront(console, buf);
+    snprintf(buf, sizeof buf, "Commit: %s\n", TIC_VERSION_HASH);
+    printFront(console, buf);
+    printFront(console, "Resolution: 240x136\n");
+    printFront(console, "Runtime: Lua\n");
+    printFront(console, "Platform: see host OS\n");
+    commandDone(console);
+}
+
+static void onUptimeCommand(Console* console)
+{
+    char buf[128];
+    u64 secs = leaftron_uptime_seconds();
+    u64 days = secs / 86400;
+    secs %= 86400;
+    u64 hours = secs / 3600;
+    secs %= 3600;
+    u64 mins = secs / 60;
+    secs %= 60;
+    snprintf(buf, sizeof buf, "Leaftron has been running for %02llu:%02llu:%02llu:%02llu.\n",
+             (unsigned long long)days, (unsigned long long)hours, (unsigned long long)mins, (unsigned long long)secs);
+    printLine(console);
+    printFront(console, buf);
+    commandDone(console);
+}
+
+static void onAboutCommand(Console* console)
+{
+    char buf[256];
+    printLine(console);
+    printFront(console, "About Leaftron\n");
+    printFront(console, "--------------\n");
+    snprintf(buf, sizeof buf, "Leaftron %s (%s)\n", LEAFTRON_VERSION, LEAFTRON_CODENAME);
+    printFront(console, buf);
+    snprintf(buf, sizeof buf, "Commit: %s\n", TIC_VERSION_HASH);
+    printFront(console, buf);
+    printFront(console, "Base: TIC-80 (Nesbox and contributors)\n");
+    printFront(console, "Developer: Leafole Labs\n");
+    printFront(console, "License: MIT\n");
+    printFront(console, "Website: https://leafole.dev\n");
+    commandDone(console);
+}
+
+static char cartsBuffer[8192];
+
+static bool cartsOnItem(const char* name, const char* title, const char* hash, s32 id, void* data, bool dir)
+{
+    (void)title; (void)hash; (void)id; (void)data;
+    if(dir) return true;
+    if(name && strstr(name, ".tic"))
+    {
+        strncat(cartsBuffer, name, sizeof(cartsBuffer) - strlen(cartsBuffer) - 2);
+        strcat(cartsBuffer, "\n");
+    }
+    return true;
+}
+
+static void cartsOnDone(void* data)
+{
+    Console* console = (Console*)data;
+    printLine(console);
+    printFront(console, "Cartridges:\n");
+    if(cartsBuffer[0] == '\0')
+        printFront(console, "(none)\n");
+    else
+        printFront(console, cartsBuffer);
+    cartsBuffer[0] = '\0';
+    commandDone(console);
+}
+
+static void onCartsCommand(Console* console)
+{
+    cartsBuffer[0] = '\0';
+    tic_fs_enum(console->fs, cartsOnItem, cartsOnDone, console);
+}
+
 static void onEditCommand(Console* console)
 {
     askStart(console, CONSOLE_ASK_CODE, onMoved);
@@ -891,34 +1014,6 @@ static void* getDemoCart(Console* console, const tic_script* script, s32* size)
     }
 
     return data;
-}
-
-static void onDemoLoaded(Console* console, const ConsoleAnswer* answer)
-{
-    printBack(console, "\ncart ");
-    printFront(console, answer->name);
-    printBack(console, " loaded!\n");
-
-    commandDone(console);
-}
-
-static void onLoadDemoCommandConfirmed(Console* console, const void* data)
-{
-    const tic_script* script = data;
-
-    void* cart = NULL;
-    s32 size = 0;
-
-    char path[1024];
-    getDemoCartPath(path, script);
-    const char* name = tic_tool_cart_name(path);
-
-    cart = getDemoCart(console, script, &size);
-    tic_cart_load(&console->tic->cart, cart, size);
-    tic_api_reset(console->tic);
-    free(cart);
-
-    askCart(console, name, false, onDemoLoaded);
 }
 
 static void printCartLoaded(Console* console, const char* name)
@@ -1147,12 +1242,12 @@ static void onLoadCommandConfirmed(Console* console, const void* data)
                     printError(console, "\nproject loading error");
                     printFront(console, "\nThis version only supports binary .png or .tic cartridges.");
                     printLine(console);
-                    printFront(console, "\nTIC-80 ");
+                    printFront(console, "\nLeaftron ");
                     consolePrint(console, "PRO", tic_color_light_blue);
                     printFront(console, " is needed for text files.");
                     printLine(console);
                     printFront(console, "\nLearn more:\n");
-                    printLink(console, "https://tic80.com/pro");
+                    printLink(console, "https://leafole.dev/pro");
                 }
                 else
                 {
@@ -1213,18 +1308,6 @@ static const char* LoadWarningRows[] =
         "You have unsaved changes",
         "Do you really want to load cart?",
 };
-
-static void onLoadDemoCommand(Console* console, const tic_script* script)
-{
-    if(console->view->cartChanged)
-    {
-        confirmCommand(console, LoadWarningRows, COUNT_OF(LoadWarningRows), onLoadDemoCommandConfirmed, script);
-    }
-    else
-    {
-        onLoadDemoCommandConfirmed(console, script);
-    }
-}
 
 static void onLoadCommand(Console* console)
 {
@@ -1522,13 +1605,6 @@ static void tabCompleteFilesAndDirs(TabCompleteData* data)
     tic_fs_enum(data->console->fs, addFileAndDirToTabComplete, finishTabCompleteAndFreeData, MOVE(*data));
 }
 
-static void tabCompleteConfig(TabCompleteData* data)
-{
-    addTabCompleteOption(data, "reset");
-    addTabCompleteOption(data, "default");
-    finishTabComplete(data);
-}
-
 typedef struct
 {
     const char* name;
@@ -1733,115 +1809,11 @@ static void onClsCommand(Console* console)
     commandDoneLine(console, false);
 }
 
-static void onInstallDemosCommand(Console* console)
-{
-    tic_fs* fs = console->fs;
-    u8* data = malloc(TIC_CART_SAVE_SIZE);
-
-    SCOPE(free(data))
-    {
-        printBack(console, "\nadded carts:\n\n");
-
-        FOREACH_LANG(ln)
-        {
-            for(const struct tic_demo* demo = ln->demos; demo && demo->data; demo++)
-            {
-                tic_fs_save(fs, demo->name, data, tic_tool_unzip(data, TIC_CART_SAVE_SIZE, demo->data, demo->size), true);
-                printFront(console, demo->name);
-                printLine(console);
-            }
-        }
-
-        static const char* Bunny = "bunny";
-
-        tic_fs_makedir(fs, Bunny);
-        tic_fs_changedir(fs, Bunny);
-
-        FOREACH_LANG(ln)
-        {
-            // having a Mark is not mandatory
-            if(ln->mark.data != NULL)
-            {
-                tic_fs_save(fs, ln->mark.name, data, tic_tool_unzip(data, TIC_CART_SAVE_SIZE, ln->mark.data, ln->mark.size), true);
-                printFront(console, Bunny);
-                printFront(console, "/");
-                printFront(console, ln->mark.name);
-                printLine(console);
-            }
-        }
-
-        tic_fs_dirback(fs);
-    }
-
-    commandDone(console);
-}
-
 static void onGameMenuCommand(Console* console)
 {
     askStart(console, CONSOLE_ASK_MENU, onMoved);
 }
 
-#if defined(BUILD_SURF)
-static void onSurfCommand(Console* console)
-{
-    // The browser takes the console's place; nothing of the command is left to
-    // finish, which is why this one ends where it is asked.
-    askStart(console, CONSOLE_ASK_SURF, NULL);
-}
-#endif
-
-static void onConfigCommand(Console* console)
-{
-    if(console->desc->count)
-    {
-        if(strcmp(console->desc->params->key, "reset") == 0)
-        {
-            askStart(console, CONSOLE_ASK_CONFIG_RESET, NULL);
-            printBack(console, "\nconfiguration reset :)");
-        }
-        else if(strcmp(console->desc->params->key, "default") == 0)
-        {
-            // The demo load finishes on the host's answer, where the prompt is
-            // printed: none of it is left for this command to end.
-            if(console->desc->count == 1)
-            {
-                onLoadDemoCommand(console, tic_get_script(console->tic));
-                return;
-            }
-
-            FOREACH_LANG(script)
-            {
-                if(strcmp(console->desc->params[1].key, script->name) == 0)
-                {
-                    onLoadDemoCommand(console, script);
-                    return;
-                }
-            }
-        }
-        else
-        {
-            printError(console, "\nunknown parameter:\n");
-            printError(console, console->desc->params->key);
-        }
-    }
-    else
-    {
-        CommandDesc desc =
-            {
-                .params = malloc(sizeof *desc.params),
-                .count = 1,
-            };
-
-        *desc.params = (struct Param){.key = strdup(CONFIG_TIC_PATH)};
-        *console->desc = desc;
-
-        onLoadCommand(console);
-
-        return;
-    }
-
-    commandDone(console);
-}
 
 typedef struct
 {
@@ -3165,6 +3137,46 @@ static const char HelpUsage[] = "help [<text>"
         onExitCommand,                                                                  \
         NULL,                                                                           \
         NULL)                                                                           \
+                                                                                         \
+    macro("neofetch",                                                                   \
+        NULL,                                                                           \
+        "Show Leaftron system summary.",                                                \
+        NULL,                                                                           \
+        onNeoFetchCommand,                                                              \
+        NULL,                                                                           \
+        NULL)                                                                           \
+                                                                                         \
+    macro("sysinfo",                                                                    \
+        NULL,                                                                           \
+        "Show detailed system information.",                                            \
+        NULL,                                                                           \
+        onSysInfoCommand,                                                               \
+        NULL,                                                                           \
+        NULL)                                                                           \
+                                                                                         \
+    macro("uptime",                                                                     \
+        NULL,                                                                           \
+        "Show how long Leaftron has been running.",                                     \
+        NULL,                                                                           \
+        onUptimeCommand,                                                                \
+        NULL,                                                                           \
+        NULL)                                                                           \
+                                                                                         \
+    macro("about",                                                                      \
+        NULL,                                                                           \
+        "Show Leaftron information.",                                                   \
+        NULL,                                                                           \
+        onAboutCommand,                                                                 \
+        NULL,                                                                           \
+        NULL)                                                                           \
+                                                                                         \
+    macro("carts",                                                                      \
+        NULL,                                                                           \
+        "List available cartridges.",                                                   \
+        NULL,                                                                           \
+        onCartsCommand,                                                                 \
+        NULL,                                                                           \
+        NULL)                                                                           \
                                                                                         \
     macro("edit",                                                                       \
         NULL,                                                                           \
@@ -3304,25 +3316,7 @@ static const char HelpUsage[] = "help [<text>"
         NULL,                                                                           \
         NULL)                                                                           \
                                                                                         \
-    macro("demo",                                                                       \
-        NULL,                                                                           \
-        "Install demo carts to the current directory.",                                 \
-        NULL,                                                                           \
-        onInstallDemosCommand,                                                          \
-        NULL,                                                                           \
-        NULL)                                                                           \
                                                                                         \
-    macro("config",                                                                     \
-        NULL,                                                                           \
-        "Edit system configuration cartridge.\n"                                        \
-        "Use `reset` param to reset current configuration.\n"                           \
-        "Use `default` to edit default cart template.",                                 \
-        "config [reset default]",                                                       \
-        onConfigCommand,                                                                \
-        tabCompleteConfig,                                                              \
-        NULL)                                                                           \
-                                                                                        \
-    SURF_CMD(macro)                                                                     \
                                                                                         \
     macro("menu",                                                                       \
         NULL,                                                                           \
@@ -3731,7 +3725,7 @@ static void onExport_help(Console* console, const char* param, const char* name,
 
     SCOPE(free(buf))
     {
-        ptr += sprintf(ptr, "# " TIC_NAME_FULL "\n" TIC_VERSION "\n" TIC_COPYRIGHT "\n");
+        ptr += sprintf(ptr, "# " TIC_NAME_FULL "\n" LEAFTRON_VERSION " (" TIC_VERSION_HASH ")\n" TIC_COPYRIGHT "\n");
 
         ptr += sprintf(ptr, "\n## Table of Contents\n\n");
         ptr += sprintf(ptr, "- [Welcome](#welcome)\n- [Specification](#specification)\n- [Console commands](#console-commands)\n- [API functions](#api-functions)\n- [Fill patterns](#fill-patterns)\n- [Button IDs](#button-ids)\n- [Key IDs](#key-ids)\n- [Startup options](#startup-options)\n- [Hotkeys](#hotkeys)\n- [Terms of Use](#terms-of-use)\n- [Privacy Policy](#privacy-policy)\n- [MIT License](#mit-license)\n");
@@ -4086,7 +4080,7 @@ static void onHelp_version(Console* console)
 {
     char buf[TICNAME_MAX];
 
-    consolePrint(console, "\n" TIC_VERSION, CONSOLE_BACK_TEXT_COLOR);
+    consolePrint(console, "\n" LEAFTRON_VERSION " (" TIC_VERSION_HASH ")", CONSOLE_BACK_TEXT_COLOR);
     printBack(console, "\nlanguage runtimes:\n");
 
     FOREACH_LANG(script)
@@ -4389,13 +4383,23 @@ static void onHistoryDown(Console* console)
 
 static void appendHistory(Console* console, const char* value)
 {
+    if(!value || !*value)
+        return;
+
     if(console->history.size)
-        if(strcmp(console->history.items[console->history.index = console->history.size - 1], value) == 0)
+        if(strcmp(console->history.items[console->history.size - 1], value) == 0)
             return;
 
+    if(console->history.size >= 100)
+    {
+        free(console->history.items[0]);
+        memmove(console->history.items, console->history.items + 1, (console->history.size - 1) * sizeof(char*));
+        console->history.size--;
+    }
+
+    console->history.items = realloc(console->history.items, sizeof(char*) * (console->history.size + 1));
+    console->history.items[console->history.size] = strdup(value);
     console->history.index = console->history.size++;
-    console->history.items = realloc(console->history.items, sizeof(char*) * console->history.size);
-    console->history.items[console->history.index] = strdup(value);
 }
 
 static void processConsoleCommand(Console* console)
@@ -5050,6 +5054,12 @@ Console* console_create(const ConsoleDeps* deps)
     console->desc = malloc(sizeof(CommandDesc));
 
     console->tic = deps->tic;
+
+    if(!leaftron_start_set)
+    {
+        leaftron_start_counter = tic_sys_counter_get();
+        leaftron_start_set = true;
+    }
     console->view = deps->view;
     console->fs = deps->fs;
     console->net = deps->net;

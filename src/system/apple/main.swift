@@ -244,7 +244,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         )
         
         guard let studio = studioPtr else {
-            print("Failed to initialize TIC-80 Studio.")
+            print("Failed to initialize Leaftron Studio.")
             NSApp.terminate(nil)
             return
         }
@@ -262,7 +262,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "TIC-80 Native macOS"
+        window.title = "Leaftron Native macOS"
         window.center()
         window.contentMinSize = CGSize(width: Int(TIC80_FULLWIDTH), height: Int(TIC80_FULLHEIGHT))
         window.acceptsMouseMovedEvents = true
