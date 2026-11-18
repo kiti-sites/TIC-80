@@ -6,6 +6,8 @@
 Leaftron is an independent distribution of TIC-80, maintained by Leafole Labs.
 Original project by Nesbox (TIC-80), licensed under MIT.
 
+Leaftron is 100% free. Donations are not accepted.
+
 - [About](#about)
   - [Features](#features)
 - [Binary Downloads](#binary-downloads)
